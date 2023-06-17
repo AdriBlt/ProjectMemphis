@@ -1,0 +1,84 @@
+﻿<Page x:Class="ProjectMemphis.StoryEditor.Pages.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:converter="using:ProjectMemphis.StoryEditor.Converter"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d">
+
+    <Page.Resources>
+        <converter:ObjectToStateViewModelConverter x:Key="ObjectToStateViewModel" />
+        <converter:ObjectNullabilityToVisibilityConverter x:Key="ObjectNullabilityToVisibility" />
+        <converter:UriToImageSourceConverter x:Key="UriToImageSourceConverter" />
+    </Page.Resources>
+
+    <SplitView x:Name="SplitView"
+               CompactPaneLength="48"
+               DisplayMode="Inline"
+               IsPaneOpen="True"
+               OpenPaneLength="240">
+        <SplitView.Pane>
+            <StackPanel>
+                <Button Command="{x:Bind ViewModel.SignInCommand, Mode=OneWay}" Content="Sign In" />
+                <TextBlock x:Name="userName" Text="{x:Bind ViewModel.Name, Mode=OneWay}" />
+                <Image x:Name="userImage"
+                       Width="48"
+                       Height="48"
+                       Source="{x:Bind ViewModel.Image, Converter={StaticResource UriToImageSourceConverter}, Mode=OneWay}" />
+            </StackPanel>
+        </SplitView.Pane>
+        <SplitView.Content>
+
+            <Grid x:Name="MainGrid" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+
+
+                        <Button x:Name="NewItem"
+                                Command="{x:Bind ViewModel.NewItemCommand, Mode=OneWay}"
+                                Content="{x:Bind ViewModel.NewItemCommand.Label, Mode=OneWay}" />
+                        <ListView x:Name="MainList"
+                                  ItemsSource="{x:Bind ViewModel.ListSource}"
+                                  SelectedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay, Converter={StaticResource ObjectToStateViewModel}}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <Grid Visibility="{x:Bind ViewModel.SelectedItem, Mode=OneWay, Converter={StaticResource ObjectNullabilityToVisibility}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" MinWidth="50" />
+                                <ColumnDefinition Width="2*" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.ColumnSpan="2">
+                                <TextBlock Grid.Column="0"
+                                           VerticalAlignment="Center"
+                                           Text="Name" />
+                                <TextBox Grid.Column="1"
+                                         PlaceholderText="Tape State name here"
+                                         Text="{x:Bind ViewModel.SelectedItem.Name, Mode=TwoWay}" />
+                                <RichTextBlock Grid.Column="0" IsTextSelectionEnabled="True">
+                                    <Paragraph>
+                                        <Run Text="{x:Bind ViewModel.SelectedItem.Guid, Mode=OneWay}" />
+                                    </Paragraph>
+                                </RichTextBlock>
+                                <Button x:Name="NewChild"
+                                        Command="{x:Bind ViewModel.NewChildCommand}"
+                                        CommandParameter="{Binding SelectedItem,
+                                                                   ElementName=MainList}"
+                                        Content="{x:Bind ViewModel.NewChildCommand.Label}" />
+
+                                <ListView ItemsSource="{x:Bind ViewModel.SelectedItem.Childs, Mode=OneWay}" />
+                            </StackPanel>
+                        </Grid>
+
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </SplitView.Content>
+    </SplitView>
+
+
+</Page>

@@ -1,0 +1,216 @@
+{
+  "Namespace": "TSG",
+  "Id": "0514d4c6-bf2f-4539-838e-fa6f7bd13048",
+  "Title": "Sonos - High Error Rate",
+  "Description": "The 'Sonos - High error rate' alert has been raised on the Sonos service (Sonos-Prod-CO1bProd). The Sonos service is an endpoint available to Sonos users through one of the official Sonos applications (available on PC, Mac, iOS, Android and Windows Phone) as well as some unofficial applications, such as Phonos on Windows Phone. It offers most of the Groove features inside the Sonos HiFi experience. Depending on which APIs are impacted (radio, collection, catalog, etc), some of the features might still be available in Sonos.",
+  "Tags": [
+    "Autopilot",
+    "Sonos",
+    "Music",
+    "Groove",
+    "MusicPlatform"
+  ],
+  "Owner": "bastte@microsoft.com",
+  "OwnerTeam": "xmcd@microsoft.com",
+  "RootStepId": "root",
+  "Steps": [
+    {
+      "StepType": "QuestionStep",
+      "Id": "root",
+      "Text": "You can find information about the Sonos service on its wiki page: http://mediaserviceswiki/wiki/SONOS",
+      "Question": "Are you familiar with the Sonos service?",
+      "Yes": {
+        "AnswerType": "StepAnswer",
+        "StepId": "start"
+      },
+      "No": {
+        "AnswerType": "StepAnswer",
+        "StepId": "discover-sonos-1"
+      }
+    },
+    {
+      "StepType": "SimpleStep",
+      "Id": "discover-sonos-1",
+      "Text": "Sonos is an external partner that provides access to music services on wireless speakers. See http://www.sonos.com/ for details. Groove Music is now integrated into Sonos.",
+      "Ok": {
+        "AnswerType": "StepAnswer",
+        "StepId": "discover-sonos-2"
+      }
+    },
+    {
+      "StepType": "SimpleStep",
+      "Id": "discover-sonos-2",
+      "Text": "We built a service to expose Groove Music to Sonos speakers (Sonos-Prod-CO1bProd). It allows users with a Music Pass to listen to music on their Sonos sytem",
+      "Ok": {
+        "AnswerType": "StepAnswer",
+        "StepId": "start"
+      }
+    },
+    {
+      "StepType": "QuestionStep",
+      "Id": "start",
+      "Text": "We will first try to identify the failure.",
+      "Question": "Is the alert raised by an Autopilot watchdog (alert about a keep-alive)?",
+      "Yes": {
+        "AnswerType": "StepAnswer",
+        "StepId": "watchdog-1"
+      },
+      "No": {
+        "AnswerType": "StepAnswer",
+        "StepId": "xts-1"
+      },
+      "Idk": {
+        "AnswerType": "UrlAnswer",
+        "Url": "http://sharepoint/sites/autopilot/wiki/Watchdogs.aspx"
+      }
+    },
+    {
+      "StepType": "QuestionStep",
+      "Id": "watchdog-1",
+      "Text": "The Sonos service has a watchdog to reflect its health status.",
+      "Question": "Is the Sonos keep-alive failing?",
+      "Yes": {
+        "AnswerType": "GraphAnswer",
+        "GraphId": "2a98d5fc-5939-467f-9170-4654ddac18ac"
+      },
+      "No": {
+        "AnswerType": "StepAnswer",
+        "StepId": "watchdog-2"
+      },
+      "Idk": {
+        "AnswerType": "GraphAnswer",
+        "GraphId": "2a98d5fc-5939-467f-9170-4654ddac18ac",
+        "CallbackStepId": "watchdog-1-graph"
+      }
+    },
+    {
+      "StepType": "QuestionStep",
+      "Id": "watchdog-1-graph",
+      "Text": "You've completed the standard watchdog keep-alive resolution steps",
+      "Question": "Is the issue now fixed?",
+      "Yes": {
+        "AnswerType": "FinalAnswer",
+        "IsSuccess": true
+      },
+      "No": {
+        "AnswerType": "StepAnswer",
+        "StepId": "watchdog-2"
+      }
+    },
+    {
+      "StepType": "SimpleStep",
+      "Id": "watchdog-2",
+      "Text": "Then it must be the Music Platform that is failing. There must be an issue with the Music Platform service.",
+      "Ok": {
+        "AnswerType": "StepAnswer",
+        "StepId": "music-platform-graph"
+      }
+    },
+    {
+      "StepType": "QuestionStep",
+      "Id": "music-platform-graph",
+      "Text": "You've completed the Music Platform resolution steps",
+      "Question": "Is the issue now fixed?",
+      "Yes": {
+        "AnswerType": "FinalAnswer",
+        "IsSuccess": true
+      },
+      "No": {
+        "AnswerType": "FinalAnswer",
+        "IsSuccess": false
+      }
+    },
+    {
+      "StepType": "SimpleStep",
+      "Id": "xts-1",
+      "Text": "Open the Sonos dashboard on XTS: xts://?view=Sonos/Sonos dashboard.xts&Environments=Sonos-Prod-CO1bProd.CO1bProd",
+      "Ok": {
+        "AnswerType": "StepAnswer",
+        "StepId": "xts-2"
+      }
+    },
+    {
+      "StepType": "QuestionStep",
+      "Id": "xts-2",
+      "Text": "Errors in Sonos are usually triggered by failures in its dependencies. Sonos calls the Music Platform service which abstracts Cloud Collection, Discovery, Master Catalog, etc. Browse the graphs to identify where the issue is coming from.",
+      "Question": "Have you identified which dependency is failing?",
+      "Yes": {
+        "AnswerType": "StepAnswer",
+        "StepId": "dependency"
+      },
+      "No": {
+        "AnswerType": "StepAnswer",
+        "StepId": "test-on-sonos-1"
+      }
+    },
+    {
+      "StepType": "SimpleStep",
+      "Id": "dependency",
+      "Text": "Contact the owners of the failing dependency, or try to resolve the issue using their TSGs.",
+      "Ok": {
+        "AnswerType": "FinalAnswer",
+        "IsSuccess": true
+      }
+    },
+    {
+      "StepType": "QuestionStep",
+      "Id": "test-on-sonos-1",
+      "Text": "We will try to repro the failure described in the alert.",
+      "Question": "Do you have Sonos speakers?",
+      "Yes": {
+        "AnswerType": "StepAnswer",
+        "StepId": "test-on-sonos-2"
+      },
+      "No": {
+        "AnswerType": "FinalAnswer",
+        "IsSuccess": false
+      }
+    },
+    {
+      "StepType": "QuestionStep",
+      "Id": "test-on-sonos-2",
+      "Text": "Connect to the Groove music service.",
+      "Question": "Is there an issue during login?",
+      "Yes": {
+        "AnswerType": "StepAnswer",
+        "StepId": "login-issue"
+      },
+      "No": {
+        "AnswerType": "StepAnswer",
+        "StepId": "test-on-sonos-3"
+      }
+    },
+    {
+      "StepType": "QuestionStep",
+      "Id": "test-on-sonos-3",
+      "Text": "Try to repro the scenario that seems to be impacted.",
+      "Question": "Are you able to repro an issue?",
+      "Yes": {
+        "AnswerType": "StepAnswer",
+        "StepId": "contact-team"
+      },
+      "No": {
+        "AnswerType": "FinalAnswer",
+        "IsSuccess": true
+      }
+    },
+    {
+      "StepType": "SimpleStep",
+      "Id": "contact-team",
+      "Text": "If you are unable to understand the root cause, you should engage the Sonos team (xmcd@microsoft.com) and the Paris OPS team (xbmapops@microsoft.com)",
+      "Ok": {
+        "AnswerType": "FinalAnswer",
+        "IsSuccess": false
+      }
+    },
+    {
+      "StepType": "SimpleStep",
+      "Id": "login-issue",
+      "Text": "Sonos login depends on many components. We'll try to troubleshoot login errors. TODO: link to Sonos login graph",
+      "Ok": {
+        "AnswerType": "FinalAnswer",
+        "IsSuccess": true
+      }
+    }
+  ]
+}
